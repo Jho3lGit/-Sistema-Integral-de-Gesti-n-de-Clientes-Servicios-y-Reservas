@@ -1,26 +1,7 @@
 from datetime import datetime
 import logging
-
-logging.basicConfig(
-    filename="logs/sistema.log",
-    level=logging.ERROR,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-class ReservaError(Exception):
-    pass
-
-class ClienteNoEncontradoError(ReservaError):
-    pass
-
-class ServicioNoDisponibleError(ReservaError):
-    pass
-
-class ReservaInvalidaError(ReservaError):
-    pass
-
-class DatosInvalidosError(ReservaError):
-    pass
+from modelos.excepciones import (ReservaError, ClienteNoEncontradoError,
+    ServicioNoDisponibleError, ReservaInvalidaError, DatosInvalidosError)
 
 class Reserva:
 
@@ -29,7 +10,11 @@ class Reserva:
     ESTADO_CANCELADA = "CANCELADA"
 
     def __init__(self, cliente, servicio, duracion):
-        self.validar_datos(cliente, servicio, duracion)
+        try:
+            self.validar_datos(cliente, servicio, duracion)
+        except Exception as e:
+            logging.error(str(e))
+            raise
         self.cliente = cliente
         self.servicio = servicio
         self.duracion = duracion
@@ -76,14 +61,12 @@ class Reserva:
         finally:
             print("Finalizó el proceso de reserva.")
 
-    def calcular_costo(self):
+    def calcular_costo(self, impuesto=0.0, descuento=0.0):
         try:
-            if not hasattr(self.servicio, 'precio'):
-                raise DatosInvalidosError("El servicio no tiene precio definido.")
-            return self.servicio.precio * self.duracion
+            return self.servicio.calcular_costo(self.duracion, impuesto, descuento)
         except Exception as e:
             logging.error(str(e))
-            raise DatosInvalidosError("Error al calcular el costo.") from e
+            raise
 
     def __str__(self):
         return (f"Cliente: {self.cliente.nombre} | Servicio: {self.servicio.nombre} | "
