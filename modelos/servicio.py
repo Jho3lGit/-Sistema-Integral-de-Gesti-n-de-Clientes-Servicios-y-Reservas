@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod  # Herramientas para crear clases y métodos abstractos
+from abc import abstractmethod  # Herramienta para declarar métodos abstractos (ABC ya viene de Entidad)
 
+from modelos.entidad import Entidad  # Clase abstracta general de la que hereda Servicio
 from modelos.excepciones import (  # Importa las excepciones personalizadas que usa este módulo
     DatosInvalidosError,  # Error de datos faltantes o fuera de rango
     ServicioNoDisponibleError,  # Error cuando el servicio no se puede usar
@@ -7,12 +8,13 @@ from modelos.excepciones import (  # Importa las excepciones personalizadas que 
 )  # Cierra la importación
 
 
-class Servicio(ABC):  # Clase abstracta: no se puede crear un objeto Servicio directamente
+class Servicio(Entidad):  # Clase abstracta que hereda de Entidad: no se puede instanciar directamente
 
     def __init__(self, nombre, precio, disponible=True):  # Constructor común a todos los servicios
         self.nombre = nombre  # Asigna usando el setter, que valida el nombre
         self.precio = precio  # Asigna usando el setter, que valida la tarifa
         self.disponible = disponible  # Asigna usando el setter, que valida que sea booleano
+        super().__init__()  # Inicializa Entidad: asigna el identificador autoincremental
 
     @property  # Permite leer el atributo privado como si fuera público
     def nombre(self):  # Getter del nombre
