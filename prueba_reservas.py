@@ -1,6 +1,4 @@
 
-"""Prueba de Reservas.py integrada con los servicios (casos válidos e inválidos)."""
-
 from modelos.gestor_servicios import GestorServicios  # Se importa primero: configura el log
 from modelos.Reservas import Reserva, GestorReservas  # Clases de reservas
 from modelos.excepciones import SoftwareFJError  # Base de las excepciones propias
