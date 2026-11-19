@@ -9,6 +9,9 @@ Jerarquía:
     │   ├── TarifaInvalidaError
     │   ├── ServicioNoDisponibleError
     │   └── ServicioNoEncontradoError
+    ├── ClienteError
+    │   ├── ClienteInvalidoError
+    │   └── ClienteDuplicadoError
     └── DatosInvalidosError
 """
 
@@ -65,3 +68,21 @@ class DatosInvalidosError(SoftwareFJError):  # Datos faltantes o fuera de rango 
     """Se lanza cuando un dato obligatorio falta o tiene un valor no permitido."""
 
     pass  # Hereda todo de SoftwareFJError
+
+
+class ClienteError(SoftwareFJError):  # Base de los errores de clientes
+    """Errores relacionados con la gestión de clientes."""
+
+    pass  # Hereda todo de SoftwareFJError
+
+
+class ClienteInvalidoError(ClienteError):  # Algún dato del cliente no es válido
+    """Se lanza cuando el nombre, correo o teléfono del cliente falta o no es válido."""
+
+    pass  # Hereda todo de ClienteError
+
+
+class ClienteDuplicadoError(ClienteError):  # Ya hay un cliente con ese correo
+    """Se lanza cuando se intenta registrar un correo que ya existe."""
+
+    pass  # Hereda todo de ClienteError
