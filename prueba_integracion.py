@@ -4,8 +4,10 @@ from modelos.Reservas import Reserva, GestorReservas
 from modelos.excepciones import (
     ClienteDuplicadoError,
     ClienteNoEncontradoError,
+    DatosInvalidosError,
     ReservaInvalidaError,
     ServicioNoDisponibleError,
+    TarifaInvalidaError,
 )
 
 
@@ -30,13 +32,30 @@ def ejecutar_pruebas():
     equipo = servicios.crear_servicio("equipo", "Cámara 4K", 90000, tipo_equipo="Video", deposito=150000)
     asesoria = servicios.crear_servicio("asesoria", "Consultoría Cloud", 150000, nivel="Experto")
 
-    # 3. Flujo completo de reserva (Crear -> Confirmar -> Calcular costo -> Procesar)
+    # 2.1 Servicios inválidos: no deben crearse ni quedar registrados en el gestor
+    total_antes = len(servicios.listar_servicios())
+    try:
+        servicios.crear_servicio("sala", "Sala Tarifa Negativa", -50000, capacidad=10)
+        assert False, "Debió fallar por tarifa negativa"
+    except TarifaInvalidaError as e:
+        print(f"[OK] Servicio inválido (tarifa negativa) rechazado: {e}")
+    try:
+        servicios.crear_servicio("asesoria", "Asesoría Nivel Inexistente", 80000, nivel="master")
+        assert False, "Debió fallar por nivel inexistente"
+    except DatosInvalidosError as e:
+        print(f"[OK] Servicio inválido (nivel inexistente) rechazado: {e}")
+    assert len(servicios.listar_servicios()) == total_antes, "Un servicio inválido quedó registrado"
+    print("[OK] Los servicios inválidos no quedaron registrados en el gestor.")
+
+    # 3. Flujo completo de reserva exitosa (Crear -> Confirmar -> Calcular costo -> Procesar)
+    print("\n--- Reserva exitosa completa ---")
     cliente_buscado = clientes.buscar_cliente("carlos@correo.com")
     servicio_buscado = servicios.buscar_servicio("Auditorio Principal")
 
     reserva1 = Reserva(cliente_buscado, servicio_buscado, 4)
     reservas.agregar_reserva(reserva1)
     assert reserva1.estado == Reserva.ESTADO_PENDIENTE
+    print(f"1) Creada:     {reserva1}")
 
     # Intentar procesar antes de confirmar debe lanzar ReservaInvalidaError
     try:
@@ -47,10 +66,14 @@ def ejecutar_pruebas():
 
     reserva1.confirmar()
     assert reserva1.estado == Reserva.ESTADO_CONFIRMADA
+    print(f"2) Confirmada: {reserva1}")
     costo_sala = reserva1.calcular_costo(impuesto=19, descuento=10)
     # 120,000 * 4 = 480,000 -> -10% = 432,000 -> +19% IVA = 514,080.0
     assert costo_sala == 514080.0, f"Costo inesperado: {costo_sala}"
+    print(f"3) Costo:      ${costo_sala:,.2f} (IVA 19%, descuento 10%)")
     reserva1.procesar()
+    assert reserva1.costo == costo_sala
+    print(f"4) Procesada:  {reserva1}")
     print(f"[OK] Flujo completo de reserva de sala confirmado. Total: ${costo_sala:,.2f}")
 
     # 4. Cálculo polimórfico con equipo (incluye depósito sin IVA/descuento)
