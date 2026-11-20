@@ -21,6 +21,7 @@ class Reserva:
         self.servicio = servicio
         self.duracion = duracion
         self.estado = self.ESTADO_PENDIENTE
+        self.costo = None  # Se llena cuando se calcula el costo; permite registrarlo al procesar
         self.fecha_creacion = datetime.now()
         logging.info(f"Reserva creada: {self}")  # Registra el evento exitoso de creación
 
@@ -75,7 +76,8 @@ class Reserva:
             raise
         else:
             print(f"Reserva procesada correctamente para {self.cliente.nombre}")
-            logging.info(f"Reserva procesada: {self}")  # Registra el evento exitoso
+            total = f" | Costo: ${self.costo:,.2f}" if self.costo is not None else ""  # Incluye el costo si ya se calculó
+            logging.info(f"Reserva procesada: {self}{total}")  # Registra el evento exitoso
         finally:
             print("Finalizó el proceso de reserva.")
 
@@ -89,7 +91,8 @@ class Reserva:
             logging.error(f"Error inesperado al calcular el costo de la reserva: {type(e).__name__}: {e}")  # Lo registra
             raise DatosInvalidosError("No se pudo calcular el costo de la reserva.") from e  # Lo convierte en excepción propia y encadena la causa
         else:  # Solo se ejecuta si el cálculo no tuvo errores
-            logging.info(f"Costo calculado de la reserva: ${costo:,.2f}")  # Registra el evento exitoso
+            self.costo = costo  # Guarda el último costo calculado
+            logging.info(f"Costo calculado de la reserva: ${costo:,.2f} | {self}")  # Registra el evento exitoso
             return costo  # Retorna el costo calculado
 
     def __str__(self):
