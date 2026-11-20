@@ -1,4 +1,6 @@
 
+"""Prueba de Reservas.py integrada con los servicios (casos válidos e inválidos)."""
+
 from modelos.gestor_servicios import GestorServicios  # Se importa primero: configura el log
 from modelos.Reservas import Reserva, GestorReservas  # Clases de reservas
 from modelos.excepciones import SoftwareFJError  # Base de las excepciones propias
@@ -15,6 +17,8 @@ def probar(descripcion, accion):  # Ejecuta una prueba y muestra el resultado o 
         resultado = accion()  # Ejecuta la función recibida
     except SoftwareFJError as e:  # Captura errores propios para no detener el script
         print(f"   ERROR {type(e).__name__}: {e}")  # Muestra tipo y mensaje
+        if e.__cause__:  # Si el error fue encadenado con "from e"
+            print(f"   Causa original: {type(e.__cause__).__name__}")  # Muestra el tipo de la causa
     else:  # Si no hubo error
         print(f"   OK: {resultado}")  # Muestra el resultado
 
@@ -46,4 +50,25 @@ asesoria.disponible = False  # Desactiva la asesoría
 r3 = Reserva(cliente, asesoria, 2)  # Reserva sobre un servicio no disponible
 probar("13. Confirmar servicio no disponible", r3.confirmar)
 probar("14. Buscar reserva inexistente", lambda: gestor.buscar_reserva(9))
+
+
+class ServicioDefectuoso:  # Servicio de prueba cuyo cálculo falla con un error de Python
+    nombre = "Servicio defectuoso"  # Atributo que usa Reserva
+    disponible = True  # Atributo que usa confirmar()
+
+    def calcular_costo(self, duracion, impuesto=0.0, descuento=0.0):  # Misma firma que los servicios reales
+        """Simula un cálculo inconsistente (división por cero)."""
+        return duracion / 0  # Lanza ZeroDivisionError
+
+
+probar("15. Duración de tipo texto", lambda: Reserva(cliente, sala, "dos"))  # DatosInvalidosError (antes TypeError)
+probar("16. Duración faltante", lambda: Reserva(cliente, sala, None))  # DatosInvalidosError
+probar("17. Duración nan", lambda: Reserva(cliente, sala, float("nan")))  # DatosInvalidosError
+probar("18. Cliente que es un texto", lambda: Reserva("Ana", sala, 2))  # ReservaInvalidaError
+probar("19. Servicio que es un texto", lambda: Reserva(cliente, "Sala Juntas", 2))  # ReservaInvalidaError
+probar("20. Descuento nan en el costo", lambda: r2.calcular_costo(descuento=float("nan")))  # DatosInvalidosError
+r4 = Reserva(cliente, ServicioDefectuoso(), 2)  # Reserva con un servicio cuyo cálculo falla
+probar("21. Cálculo inconsistente (error encadenado)", r4.calcular_costo)  # DatosInvalidosError desde ZeroDivisionError
+probar("22. Buscar reserva con índice de texto", lambda: gestor.buscar_reserva("uno"))  # ReservaInvalidaError (antes TypeError)
+probar("23. Agregar algo que no es reserva", lambda: gestor.agregar_reserva("reserva"))  # ReservaInvalidaError
 print(gestor.listar_reservas())  # Muestra las reservas guardadas

@@ -42,6 +42,15 @@ def costo_servicio_desactivado():  # Prueba auxiliar para el caso 12
 probar("12. Servicio no disponible", costo_servicio_desactivado)  # ServicioNoDisponibleError
 probar("13. Posición inexistente (error encadenado)", lambda: gestor.obtener_servicio(10))  # ServicioNoEncontradoError
 probar("14. Instanciar la clase abstracta", lambda: Servicio("Genérico", 1000))  # TypeError de Python
+probar("15. Tarifa nan", lambda: gestor.crear_servicio("sala", "Sala N", float("nan"), capacidad=5))  # TarifaInvalidaError
+probar("16. Tarifa inf", lambda: gestor.crear_servicio("sala", "Sala I", float("inf"), capacidad=5))  # TarifaInvalidaError
+probar("17. Duración nan", lambda: gestor.calcular_costo_servicio("Sala Juntas", float("nan")))  # DatosInvalidosError
+probar("18. Duración de tipo texto", lambda: gestor.calcular_costo_servicio("Sala Juntas", "dos"))  # DatosInvalidosError
+probar("19. Impuesto nan", lambda: gestor.calcular_costo_servicio(  # DatosInvalidosError
+    "Sala Juntas", 2, impuesto=float("nan")))  # Porcentaje no finito
+probar("20. Depósito inf", lambda: gestor.crear_servicio(  # DatosInvalidosError
+    "equipo", "Equipo X", 1000, tipo_equipo="Cámara", deposito=float("inf")))  # Depósito no finito
+probar("21. Buscar servicio inexistente", lambda: gestor.buscar_servicio("Sala Fantasma"))  # ServicioNoEncontradoError
 
 print("\n>> Polimorfismo: costo de 2 unidades de cada servicio disponible")  # Título de la demostración
 for indice in range(2):  # Recorre la sala y el equipo
