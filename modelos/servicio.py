@@ -1,3 +1,4 @@
+import math  # Para math.isfinite: detecta valores nan e inf
 from abc import abstractmethod  # Herramienta para declarar métodos abstractos (ABC ya viene de Entidad)
 
 from modelos.entidad import Entidad  # Clase abstracta general de la que hereda Servicio
@@ -36,6 +37,8 @@ class Servicio(Entidad):  # Clase abstracta que hereda de Entidad: no se puede i
             raise TarifaInvalidaError("La tarifa es obligatoria.")  # Avisa que falta la tarifa
         if isinstance(valor, bool) or not isinstance(valor, (int, float)):  # bool cuenta como int en Python, por eso se excluye
             raise TarifaInvalidaError(f"La tarifa debe ser numérica, se recibió {type(valor).__name__}.")  # Avisa tipo incorrecto
+        if not math.isfinite(valor):  # Rechaza tarifas nan o inf
+            raise TarifaInvalidaError(f"La tarifa debe ser un número finito, se recibió {valor}.")  # Avisa valor inválido
         if valor <= 0:  # Rechaza tarifas cero o negativas
             raise TarifaInvalidaError(f"La tarifa debe ser mayor que cero, se recibió {valor}.")  # Avisa valor inválido
         self.__precio = valor  # Guarda la tarifa ya validada
@@ -59,12 +62,16 @@ class Servicio(Entidad):  # Clase abstracta que hereda de Entidad: no se puede i
             raise DatosInvalidosError(f"Falta la duración en {unidad}.")  # Avisa parámetro faltante
         if isinstance(duracion, bool) or not isinstance(duracion, (int, float)):  # Rechaza tipos no numéricos
             raise DatosInvalidosError(f"La duración en {unidad} debe ser numérica.")  # Avisa tipo incorrecto
+        if not math.isfinite(duracion):  # Rechaza duraciones nan o inf
+            raise DatosInvalidosError(f"La duración en {unidad} debe ser un número finito.")  # Avisa valor inválido
         if duracion <= 0:  # Rechaza duraciones cero o negativas
             raise DatosInvalidosError(f"La duración en {unidad} debe ser mayor que cero.")  # Avisa valor inválido
 
     def _validar_porcentaje(self, valor, nombre_campo):  # Método auxiliar para impuesto y descuento
         if isinstance(valor, bool) or not isinstance(valor, (int, float)):  # Rechaza tipos no numéricos
             raise DatosInvalidosError(f"El {nombre_campo} debe ser numérico.")  # Avisa tipo incorrecto
+        if not math.isfinite(valor):  # Rechaza porcentajes nan o inf
+            raise DatosInvalidosError(f"El {nombre_campo} debe ser un número finito.")  # Avisa valor inválido
         if valor < 0 or valor > 100:  # Rechaza porcentajes fuera del rango permitido
             raise DatosInvalidosError(f"El {nombre_campo} debe estar entre 0 y 100, se recibió {valor}.")  # Avisa el error
 

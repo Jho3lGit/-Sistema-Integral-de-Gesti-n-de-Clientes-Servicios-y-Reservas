@@ -1,3 +1,5 @@
+import math  # Para math.isfinite: detecta valores nan e inf
+
 from modelos.excepciones import DatosInvalidosError  # Excepción para parámetros faltantes o inválidos
 from modelos.servicio import Servicio  # Clase abstracta de la que hereda
 
@@ -25,6 +27,8 @@ class AlquilerEquipo(Servicio):  # Hereda de Servicio y concreta sus métodos ab
             raise DatosInvalidosError("El tipo de equipo debe ser un texto no vacío.")  # Avisa tipo incorrecto
         if isinstance(self.__deposito, bool) or not isinstance(self.__deposito, (int, float)):  # Exige número
             raise DatosInvalidosError("El depósito debe ser numérico.")  # Avisa tipo incorrecto
+        if not math.isfinite(self.__deposito):  # Rechaza depósitos nan o inf
+            raise DatosInvalidosError("El depósito debe ser un número finito.")  # Avisa valor inválido
         if self.__deposito < 0:  # Rechaza depósitos negativos (cero sí se permite)
             raise DatosInvalidosError("El depósito no puede ser negativo.")  # Avisa valor inválido
         return True  # Indica que la validación pasó
