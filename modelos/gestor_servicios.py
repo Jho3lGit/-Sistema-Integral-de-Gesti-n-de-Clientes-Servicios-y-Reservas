@@ -65,6 +65,7 @@ class GestorServicios:  # Administra todos los servicios en una lista interna
         for servicio in self.__servicios:  # Recorre la lista de servicios
             if servicio.nombre.lower() == str(nombre).strip().lower():  # Compara sin distinguir mayúsculas
                 return servicio  # Retorna el servicio encontrado
+        logging.error(f"Servicio no encontrado: '{nombre}'.")  # Registra el error antes de lanzarlo
         raise ServicioNoEncontradoError(f"No existe un servicio llamado '{nombre}'.")  # Avisa que no se encontró
 
     def calcular_costo_servicio(self, nombre, duracion, impuesto=0.0, descuento=0.0):  # Cálculo con registro
