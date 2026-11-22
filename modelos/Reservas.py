@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import math  # Para math.isfinite: detecta valores nan e inf
-from modelos.excepciones import (ReservaError, ClienteNoEncontradoError,
+from modelos.excepciones import (ClienteNoEncontradoError,  # Se quitó ReservaError: no se usaba en este módulo
     ServicioNoDisponibleError, ReservaInvalidaError, DatosInvalidosError,
     SoftwareFJError)  # SoftwareFJError: para separar errores propios de los inesperados
 
@@ -108,6 +108,7 @@ class GestorReservas:
             logging.error("Se intentó agregar un objeto que no es una reserva.")  # Registra el error antes de lanzarlo
             raise ReservaInvalidaError("El objeto no es una reserva válida.")
         self.reservas.append(reserva)
+        logging.info(f"Reserva agregada al gestor: {reserva}")  # Registra el evento exitoso
 
     def buscar_reserva(self, indice):
         try:
