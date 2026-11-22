@@ -40,9 +40,9 @@ probar("4. Procesar confirmada", r1.procesar)
 probar("5. Costo sala 3 h con IVA 19%", lambda: r1.calcular_costo(impuesto=19))  # Delega al servicio
 r2 = Reserva(cliente, equipo, 2)  # Reserva del equipo por 2 días
 probar("6. Costo equipo 2 días", r2.calcular_costo)  # Otra regla, mismo método
-probar("7. Cancelar", lambda: (r1.cancelar(), r1.estado)[1])
-probar("8. Cancelar dos veces", r1.cancelar)  # ReservaInvalidaError
-probar("9. Confirmar cancelada", r1.confirmar)  # ReservaInvalidaError
+probar("7. Cancelar", lambda: (r2.cancelar(), r2.estado)[1])  # Se cancela r2 porque r1 ya quedó PROCESADA
+probar("8. Cancelar dos veces", r2.cancelar)  # ReservaInvalidaError
+probar("9. Confirmar cancelada", r2.confirmar)  # ReservaInvalidaError
 probar("10. Servicio None", lambda: Reserva(cliente, None, 2))
 probar("11. Cliente None", lambda: Reserva(None, sala, 2))
 probar("12. Duración negativa", lambda: Reserva(cliente, sala, -1))
@@ -71,4 +71,7 @@ r4 = Reserva(cliente, ServicioDefectuoso(), 2)  # Reserva con un servicio cuyo c
 probar("21. Cálculo inconsistente (error encadenado)", r4.calcular_costo)  # DatosInvalidosError desde ZeroDivisionError
 probar("22. Buscar reserva con índice de texto", lambda: gestor.buscar_reserva("uno"))  # ReservaInvalidaError (antes TypeError)
 probar("23. Agregar algo que no es reserva", lambda: gestor.agregar_reserva("reserva"))  # ReservaInvalidaError
+probar("24. Procesar dos veces", r1.procesar)  # ReservaInvalidaError: r1 ya está PROCESADA
+probar("25. Cancelar una reserva procesada", r1.cancelar)  # ReservaInvalidaError
+probar("26. Confirmar una reserva procesada", r1.confirmar)  # ReservaInvalidaError
 print(gestor.listar_reservas())  # Muestra las reservas guardadas

@@ -72,7 +72,7 @@ Al iniciar aparece el menú principal. Se escribe el número de la opción y se 
 4. Opción 6: confirme la reserva número 1.
 5. Opción 9: calcule el costo de la reserva 1, con impuesto 19 y descuento 10 (resultado: $160,650.00).
 6. Opción 8: procese la reserva 1.
-7. Opción 10: revise que la reserva aparezca en la lista.
+7. Opción 10: revise que la reserva aparezca en la lista con estado PROCESADA.
 8. Opción 0: salga del programa y revise logs/sistema.log.
 
 ### Qué pasa si hay un error

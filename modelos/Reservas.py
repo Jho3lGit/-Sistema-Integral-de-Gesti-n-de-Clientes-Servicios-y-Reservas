@@ -10,6 +10,7 @@ class Reserva:
     ESTADO_PENDIENTE = "PENDIENTE"
     ESTADO_CONFIRMADA = "CONFIRMADA"
     ESTADO_CANCELADA = "CANCELADA"
+    ESTADO_PROCESADA = "PROCESADA"  # Estado final: la reserva ya fue procesada
 
     def __init__(self, cliente, servicio, duracion):
         try:
@@ -47,6 +48,8 @@ class Reserva:
         try:
             if self.estado == self.ESTADO_CANCELADA:
                 raise ReservaInvalidaError("No se puede confirmar una reserva cancelada.")
+            if self.estado == self.ESTADO_PROCESADA:  # Una reserva procesada ya está cerrada
+                raise ReservaInvalidaError("La reserva ya fue procesada y no se puede confirmar de nuevo.")  # Operación no permitida
             if hasattr(self.servicio, 'disponible') and not self.servicio.disponible:
                 raise ServicioNoDisponibleError("El servicio no se encuentra disponible.")
             self.estado = self.ESTADO_CONFIRMADA
@@ -60,6 +63,8 @@ class Reserva:
         try:
             if self.estado == self.ESTADO_CANCELADA:
                 raise ReservaInvalidaError("La reserva ya se encuentra cancelada.")
+            if self.estado == self.ESTADO_PROCESADA:  # Una reserva procesada ya está cerrada
+                raise ReservaInvalidaError("No se puede cancelar una reserva ya procesada.")  # Operación no permitida
             self.estado = self.ESTADO_CANCELADA
         except Exception as e:
             logging.error(str(e))
@@ -75,6 +80,7 @@ class Reserva:
             logging.error(str(e))
             raise
         else:
+            self.estado = self.ESTADO_PROCESADA  # Cambia al estado final; ya no puede procesarse otra vez
             print(f"Reserva procesada correctamente para {self.cliente.nombre}")
             total = f" | Costo: ${self.costo:,.2f}" if self.costo is not None else ""  # Incluye el costo si ya se calculó
             logging.info(f"Reserva procesada: {self}{total}")  # Registra el evento exitoso
